@@ -18,6 +18,10 @@ const tints = [
   { bg: 'from-rose-500/10 to-red-500/5', ring: 'ring-rose-500/20', text: 'text-rose-400', dot: 'bg-rose-400' },
   { bg: 'from-violet-500/10 to-fuchsia-500/5', ring: 'ring-violet-500/20', text: 'text-violet-400', dot: 'bg-violet-400' },
   { bg: 'from-lime-500/10 to-emerald-500/5', ring: 'ring-lime-500/20', text: 'text-lime-400', dot: 'bg-lime-400' },
+  { bg: 'from-cyan-500/10 to-blue-500/5', ring: 'ring-cyan-500/20', text: 'text-cyan-400', dot: 'bg-cyan-400' },
+  { bg: 'from-pink-500/10 to-rose-500/5', ring: 'ring-pink-500/20', text: 'text-pink-400', dot: 'bg-pink-400' },
+  { bg: 'from-yellow-500/10 to-amber-500/5', ring: 'ring-yellow-500/20', text: 'text-yellow-400', dot: 'bg-yellow-400' },
+  { bg: 'from-teal-500/10 to-cyan-500/5', ring: 'ring-teal-500/20', text: 'text-teal-400', dot: 'bg-teal-400' },
 ];
 
 function Categories() {

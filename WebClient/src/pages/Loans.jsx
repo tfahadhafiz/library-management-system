@@ -40,6 +40,16 @@ function toDatetimeLocal(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+function addOneMonth(dateStr) {
+  const d = new Date(dateStr);
+  d.setMonth(d.getMonth() + 1);
+  return d.toISOString().split('T')[0];
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
 function Loans() {
   const [loans, setLoans] = useState([]);
   const [books, setBooks] = useState([]);
@@ -49,11 +59,14 @@ function Loans() {
   const [returnTarget, setReturnTarget] = useState(null);
   const [returnDateTime, setReturnDateTime] = useState('');
   const [undoTarget, setUndoTarget] = useState(null);
-  const [form, setForm] = useState({ bookId: '', memberId: '', loanDate: '', dueDate: '' });
+  const [form, setForm] = useState({
+    bookId: '', memberId: '', loanDate: todayStr(), dueDate: addOneMonth(todayStr())
+  });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('dueDate');
   const [ascending, setAscending] = useState(true);
+
 
   const loadAll = async () => {
     try {
@@ -82,7 +95,7 @@ function Loans() {
         returnDate: null
       });
       toast.success('Book borrowed successfully');
-      setForm({ bookId: '', memberId: '', loanDate: '', dueDate: '' });
+      setForm({ bookId: '', memberId: '', loanDate: todayStr(), dueDate: addOneMonth(todayStr()) });
       loadAll();
     } catch {
       toast.error('Failed to create loan');
@@ -148,6 +161,14 @@ function Loans() {
     return 'active';
   };
 
+  const sortedBooks = useMemo(() => {
+    return [...books].sort((a, b) => a.title.localeCompare(b.title));
+  }, [books]);
+
+  const sortedMembers = useMemo(() => {
+    return [...members].sort((a, b) => a.fullName.localeCompare(b.fullName));
+  }, [members]);
+
   const filteredLoans = useMemo(() => {
     let result = loans.filter(l => {
       const bookTitle = l.book ? l.book.title : '';
@@ -177,20 +198,36 @@ function Loans() {
           <FormField label="Book">
             <select className={inputClass} value={form.bookId} onChange={e => setForm({ ...form, bookId: e.target.value })} required>
               <option value="">Select Book</option>
-              {books.map(b => <option key={b.bookId} value={b.bookId}>{b.title} ({b.availableCopies} avail.)</option>)}
+              {sortedBooks.map(b => (
+                <option key={b.bookId} value={b.bookId} disabled={b.availableCopies === 0}>
+                  {b.title} ({b.availableCopies === 0 ? 'No copies available' : `${b.availableCopies} avail.`})
+                </option>
+              ))}
             </select>
           </FormField>
           <FormField label="Member">
             <select className={inputClass} value={form.memberId} onChange={e => setForm({ ...form, memberId: e.target.value })} required>
               <option value="">Select Member</option>
-              {members.map(m => <option key={m.memberId} value={m.memberId}>{m.fullName}</option>)}
+              {sortedMembers.map(m => <option key={m.memberId} value={m.memberId}>{m.fullName}</option>)}
             </select>
           </FormField>
           <FormField label="Loan Date">
-            <input type="date" className={inputClass} value={form.loanDate} onChange={e => setForm({ ...form, loanDate: e.target.value })} required />
+            <input
+              type="date"
+              className={inputClass}
+              value={form.loanDate}
+              onChange={e => setForm({ ...form, loanDate: e.target.value, dueDate: addOneMonth(e.target.value) })}
+              required
+            />
           </FormField>
           <FormField label="Due Date">
-            <input type="date" className={inputClass} value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required />
+            <input
+              type="date"
+              className={inputClass}
+              value={form.dueDate}
+              onChange={e => setForm({ ...form, dueDate: e.target.value })}
+              required
+            />
           </FormField>
           <button type="submit" className="bg-gradient-to-r from-purple-400 to-fuchsia-500 hover:from-purple-300 hover:to-fuchsia-400 text-slate-900 py-2.5 rounded-xl font-semibold transition-all mb-4 sm:mb-4">
             Borrow

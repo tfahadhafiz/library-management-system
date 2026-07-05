@@ -15,7 +15,9 @@ import SelectFilter from '../components/ui/SelectFilter';
 const spineGradients = [
   'from-amber-400 to-orange-600', 'from-emerald-400 to-teal-600', 'from-sky-400 to-indigo-600',
   'from-rose-400 to-red-600', 'from-violet-400 to-fuchsia-600', 'from-lime-400 to-emerald-600',
-  'from-cyan-400 to-blue-600', 'from-pink-400 to-rose-600',
+  'from-cyan-400 to-blue-600', 'from-pink-400 to-rose-600', 'from-yellow-400 to-amber-600',
+  'from-teal-400 to-cyan-600', 'from-purple-400 to-violet-600', 'from-red-400 to-orange-600',
+  'from-indigo-400 to-purple-600', 'from-fuchsia-400 to-pink-600', 'from-green-400 to-lime-600',
 ];
 
 function Books() {
@@ -57,6 +59,16 @@ function Books() {
     const years = [...new Set(books.map(b => b.publishedYear))].sort((a, b) => b - a);
     return years;
   }, [books]);
+
+  const sortedAuthors = useMemo(() => {
+  return [...authors].sort((a, b) =>
+    `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+  );
+}, [authors]);
+
+  const sortedCategories = useMemo(() => {
+    return [...categories].sort((a, b) => a.name.localeCompare(b.name));
+  }, [categories]);
   
   const filteredBooks = useMemo(() => {
     let result = books.filter(b => {
@@ -160,13 +172,13 @@ function Books() {
     <SearchInput value={search} onChange={setSearch} placeholder="Search by title or ISBN..." />
 
     <SelectFilter value={filterAuthor} onChange={setFilterAuthor}>
-        <option value="">All Authors</option>
-        {authors.map(a => <option key={a.authorId} value={a.authorId}>{a.firstName} {a.lastName}</option>)}
+      <option value="">All Authors</option>
+      {sortedAuthors.map(a => <option key={a.authorId} value={a.authorId}>{a.firstName} {a.lastName}</option>)}
     </SelectFilter>
 
     <SelectFilter value={filterCategory} onChange={setFilterCategory}>
-        <option value="">All Categories</option>
-        {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.name}</option>)}
+      <option value="">All Categories</option>
+      {sortedCategories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.name}</option>)}
     </SelectFilter>
 
     <SelectFilter value={filterYear} onChange={setFilterYear}>
@@ -262,13 +274,13 @@ function Books() {
           <FormField label="Author">
             <select className={inputClass} value={form.authorId} onChange={e => setForm({ ...form, authorId: e.target.value })} required>
               <option value="">Select Author</option>
-              {authors.map(a => <option key={a.authorId} value={a.authorId}>{a.firstName} {a.lastName}</option>)}
+              {sortedAuthors.map(a => <option key={a.authorId} value={a.authorId}>{a.firstName} {a.lastName}</option>)}
             </select>
           </FormField>
           <FormField label="Category">
             <select className={inputClass} value={form.categoryId} onChange={e => setForm({ ...form, categoryId: e.target.value })} required>
               <option value="">Select Category</option>
-              {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.name}</option>)}
+              {sortedCategories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.name}</option>)}
             </select>
           </FormField>
           <button type="submit" className="w-full bg-gradient-to-r from-purple-400 to-fuchsia-500 hover:from-purple-300 hover:to-fuchsia-400 text-slate-900 py-2.5 rounded-xl font-semibold mt-2 transition-all">
