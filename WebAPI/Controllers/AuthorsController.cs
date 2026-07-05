@@ -29,6 +29,13 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Author>> CreateAuthor(Author author)
         {
+            bool exists = await _context.Authors.AnyAsync(a =>
+                a.FirstName.ToLower() == author.FirstName.ToLower() &&
+                a.LastName.ToLower() == author.LastName.ToLower());
+
+            if (exists)
+                return Conflict(new { message = $"An author named '{author.FirstName} {author.LastName}' already exists." });
+
             _context.Authors.Add(author);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAuthor), new { id = author.AuthorId }, author);
@@ -38,14 +45,28 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> UpdateAuthor(int id, Author author)
         {
             if (id != author.AuthorId) return BadRequest();
+
+            bool exists = await _context.Authors.AnyAsync(a =>
+                a.AuthorId != id &&
+                a.FirstName.ToLower() == author.FirstName.ToLower() &&
+                a.LastName.ToLower() == author.LastName.ToLower());
+
+            if (exists)
+                return Conflict(new { message = $"An author named '{author.FirstName} {author.LastName}' already exists." });
+
             _context.Entry(author).State = EntityState.Modified;
 
-            try { await _context.SaveChangesAsync(); }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.Authors.AnyAsync(a => a.AuthorId == id)) return NotFound();
+                if (!await _context.Authors.AnyAsync(a => a.AuthorId == id))
+                    return NotFound();
                 throw;
             }
+
             return NoContent();
         }
 

@@ -71,8 +71,8 @@ function Categories() {
       }
       setModalOpen(false);
       loadCategories();
-    } catch {
-      toast.error('Save failed');
+    } catch (err){
+      toast.error(err.response?.data?.message || 'Save failed.');
     }
   };
 

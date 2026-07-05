@@ -19,11 +19,32 @@ namespace WebAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Book>()
-                .HasIndex(b => b.ISBN)
+                 .HasIndex(b => b.ISBN)
+                 .IsUnique();
+
+            // Same title is fine across different authors, but not for the same author
+            modelBuilder.Entity<Book>()
+                .HasIndex(b => new { b.Title, b.AuthorId })
+                .IsUnique();
+
+            modelBuilder.Entity<Author>()
+                .HasIndex(a => new { a.FirstName, a.LastName })
+                .IsUnique();
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Name)
                 .IsUnique();
 
             modelBuilder.Entity<Member>()
                 .HasIndex(m => m.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Member>()
+                .HasIndex(m => m.FullName)
+                .IsUnique();
+
+            modelBuilder.Entity<Member>()
+                .HasIndex(m => m.PhoneNumber)
                 .IsUnique();
 
             modelBuilder.Entity<User>()

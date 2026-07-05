@@ -29,6 +29,15 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Member>> CreateMember(Member member)
         {
+            if (await _context.Members.AnyAsync(m => m.FullName.ToLower() == member.FullName.ToLower()))
+                return Conflict(new { message = $"A member named '{member.FullName}' already exists." });
+
+            if (await _context.Members.AnyAsync(m => m.Email.ToLower() == member.Email.ToLower()))
+                return Conflict(new { message = $"A member with email '{member.Email}' already exists." });
+
+            if (await _context.Members.AnyAsync(m => m.PhoneNumber == member.PhoneNumber))
+                return Conflict(new { message = $"A member with phone number '{member.PhoneNumber}' already exists." });
+
             _context.Members.Add(member);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetMember), new { id = member.MemberId }, member);
@@ -38,14 +47,29 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> UpdateMember(int id, Member member)
         {
             if (id != member.MemberId) return BadRequest();
+
+            if (await _context.Members.AnyAsync(m => m.MemberId != id && m.FullName.ToLower() == member.FullName.ToLower()))
+                return Conflict(new { message = $"A member named '{member.FullName}' already exists." });
+
+            if (await _context.Members.AnyAsync(m => m.MemberId != id && m.Email.ToLower() == member.Email.ToLower()))
+                return Conflict(new { message = $"A member with email '{member.Email}' already exists." });
+
+            if (await _context.Members.AnyAsync(m => m.PhoneNumber == member.PhoneNumber))
+                return Conflict(new { message = $"A member with phone number '{member.PhoneNumber}' already exists." });
+
             _context.Entry(member).State = EntityState.Modified;
 
-            try { await _context.SaveChangesAsync(); }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.Members.AnyAsync(m => m.MemberId == id)) return NotFound();
+                if (!await _context.Members.AnyAsync(m => m.MemberId == id))
+                    return NotFound();
                 throw;
             }
+
             return NoContent();
         }
 

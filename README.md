@@ -173,9 +173,9 @@ This project is deployed entirely on Microsoft Azure using free-tier services:
 | **Web API** | Azure App Service | Free (F1) |
 | **React Frontend** | Azure Static Web Apps | Free |
 
-**Live Web App:** `[Azure Static Web App URL placeholder]`
-**Live API:** `https://library-management-api-fahad.azurewebsites.net/`
-**Live Swagger:** `https://library-management-api-fahad.azurewebsites.net/swagger`
+##### **Live Web App:** `https://white-meadow-0bba42700.7.azurestaticapps.net/login`
+##### **Live API:** `https://library-management-api-fahad.azurewebsites.net/`
+##### **Live Swagger:** `https://library-management-api-fahad.azurewebsites.net/swagger`
 
 #### Configuration Management
 

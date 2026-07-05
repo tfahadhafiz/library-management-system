@@ -73,8 +73,8 @@ function Members() {
       }
       setModalOpen(false);
       loadMembers();
-    } catch {
-      toast.error('Save failed. Email must be unique.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Save failed.');
     }
   };
 
@@ -158,7 +158,7 @@ function Members() {
             <input type="email" className={inputClass} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
           </FormField>
           <FormField label="Phone Number">
-            <input className={inputClass} value={form.phoneNumber} onChange={e => setForm({ ...form, phoneNumber: e.target.value })} />
+            <input className={inputClass} value={form.phoneNumber} onChange={e => setForm({ ...form, phoneNumber: e.target.value })} required/>
           </FormField>
           <FormField label="Membership Date">
             <input type="date" className={inputClass} value={form.membershipDate} onChange={e => setForm({ ...form, membershipDate: e.target.value })} required />

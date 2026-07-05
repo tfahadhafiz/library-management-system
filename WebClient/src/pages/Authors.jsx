@@ -66,8 +66,8 @@ function Authors() {
       }
       setModalOpen(false);
       loadAuthors();
-    } catch {
-      toast.error('Save failed. Check required fields.');
+    } catch (err){
+      toast.error(err.response?.data?.message || 'Save failed.');
     }
   };
 

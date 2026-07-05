@@ -45,16 +45,27 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> CreateBook(Book book)
         {
+            bool exists = await _context.Books.AnyAsync(b =>
+                b.Title.ToLower() == book.Title.ToLower() && b.AuthorId == book.AuthorId);
+
+            if (exists)
+                return Conflict(new { message = "This author already has a book with this title." });
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetBook), new { id = book.BookId }, book);
         }
 
-        // PUT: api/books/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, Book book)
         {
             if (id != book.BookId) return BadRequest();
+
+            bool exists = await _context.Books.AnyAsync(b =>
+                b.BookId != id && b.Title.ToLower() == book.Title.ToLower() && b.AuthorId == book.AuthorId);
+
+            if (exists)
+                return Conflict(new { message = "This author already has a book with this title." });
 
             _context.Entry(book).State = EntityState.Modified;
 

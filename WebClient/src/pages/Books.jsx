@@ -137,8 +137,8 @@ function Books() {
       }
       setModalOpen(false);
       loadAll();
-    } catch {
-      toast.error('Save failed. Check Author/Category selection.');
+    } catch (err){
+      toast.error(err.response?.data?.message || 'Save failed.');
     }
   };
 

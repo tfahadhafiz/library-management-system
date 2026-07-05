@@ -29,6 +29,10 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
+            bool exists = await _context.Categories.AnyAsync(c => c.Name.ToLower() == category.Name.ToLower());
+            if (exists)
+                return Conflict(new { message = $"A category named '{category.Name}' already exists." });
+
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetCategory), new { id = category.CategoryId }, category);
@@ -38,14 +42,26 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> UpdateCategory(int id, Category category)
         {
             if (id != category.CategoryId) return BadRequest();
+
+            bool exists = await _context.Categories.AnyAsync(c =>
+                c.CategoryId != id && c.Name.ToLower() == category.Name.ToLower());
+
+            if (exists)
+                return Conflict(new { message = $"A category named '{category.Name}' already exists." });
+
             _context.Entry(category).State = EntityState.Modified;
 
-            try { await _context.SaveChangesAsync(); }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.Categories.AnyAsync(c => c.CategoryId == id)) return NotFound();
+                if (!await _context.Categories.AnyAsync(c => c.CategoryId == id))
+                    return NotFound();
                 throw;
             }
+
             return NoContent();
         }
 
